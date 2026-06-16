@@ -32,7 +32,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Enable Apache modules
-RUN a2enmod rewrite headers expires
+RUN a2enmod rewrite headers expires remoteip \
+    && echo 'RemoteIPHeader X-Forwarded-For' >> /etc/apache2/apache2.conf \
+    && echo 'RemoteIPInternalProxy 10.0.0.0/8' >> /etc/apache2/apache2.conf \
+    && echo 'SetEnvIf X-Forwarded-Proto https HTTPS=on' >> /etc/apache2/apache2.conf
 
 # Allow .htaccess overrides
 RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
