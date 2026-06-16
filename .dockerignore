@@ -20,4 +20,3 @@ phpstan.neon
 README.md
 robots.txt
 docker-compose.yml
-docker-entrypoint.sh
