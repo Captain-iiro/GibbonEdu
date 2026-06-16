@@ -1,0 +1,43 @@
+services:
+  app:
+    build: .
+    ports:
+      - "${APP_PORT:-80}:80"
+    environment:
+      - GIBBON_DATABASE_HOST=${GIBBON_DATABASE_HOST:-db}
+      - GIBBON_DATABASE_NAME=${GIBBON_DATABASE_NAME:-gibbon}
+      - GIBBON_DATABASE_USER=${GIBBON_DATABASE_USER:-gibbon}
+      - GIBBON_DATABASE_PASSWORD=${GIBBON_DATABASE_PASSWORD:-secret}
+      - GIBBON_GUID=${GIBBON_GUID:-}
+      - GIBBON_CACHING=${GIBBON_CACHING:-10}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - gibbon_uploads:/var/www/html/uploads
+      - gibbon_cache:/var/www/html/resources/templates/cache
+      - gibbon_var:/var/www/html/var
+    restart: unless-stopped
+
+  db:
+    image: mariadb:10.11
+    environment:
+      - MARIADB_DATABASE=${GIBBON_DATABASE_NAME:-gibbon}
+      - MARIADB_USER=${GIBBON_DATABASE_USER:-gibbon}
+      - MARIADB_PASSWORD=${GIBBON_DATABASE_PASSWORD:-secret}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD:-rootpassword}
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  gibbon_uploads:
+  gibbon_cache:
+  gibbon_var:
+  mariadb_data:
