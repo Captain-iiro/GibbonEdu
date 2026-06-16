@@ -14,7 +14,6 @@ vendor
 *.neon
 CHANGEDB.php
 CHANGELOG.txt
-composer.lock
 LICENSE
 phpstan.neon
 README.md
