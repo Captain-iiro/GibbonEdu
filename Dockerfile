@@ -45,7 +45,7 @@ WORKDIR /var/www/html
 COPY . .
 
 # Install Composer dependencies (production)
-RUN composer install --no-dev --optimize-autoloader --no-interaction --no-audit
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-security-blocking
 
 # Create writable directories and set permissions
 RUN mkdir -p resources/templates/cache var uploads \
