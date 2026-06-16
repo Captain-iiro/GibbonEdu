@@ -26,8 +26,20 @@ DB_USER_E=$(escape_sq "$DB_USER")
 DB_PASS_E=$(escape_sq "$DB_PASS")
 GUID_E=$(escape_sq "$GUID")
 
-# Generate config.php from environment variables
-cat > /var/www/html/config.php <<EOF
+# Only generate config.php if the database has been initialized (gibbonSetting table exists)
+if php -r "
+    try {
+        \$pdo = new PDO('mysql:host=${DB_HOST};dbname=${DB_NAME};charset=utf8', '${DB_USER}', '${DB_PASS}');
+        \$stmt = \$pdo->query('SHOW TABLES LIKE \\\"gibbonSetting\\\"');
+        exit(\$stmt->rowCount() > 0 ? 0 : 1);
+    } catch (Exception \$e) {
+        exit(1);
+    }
+" 2>/dev/null; then
+    echo "Database already initialized, generating config.php from environment variables."
+
+    # Generate config.php from environment variables
+    cat > /var/www/html/config.php <<EOF
 <?php
 /*
 Gibbon: the flexible, open school platform
@@ -43,6 +55,9 @@ Gibbon™, Gibbon Education Ltd. (Hong Kong)
 \$caching = ${CACHING};
 \$allowImpersonateUser = [];
 EOF
+else
+    echo "Database not initialized yet (gibbonSetting table missing). Skipping config.php generation."
+fi
 
 # Ensure writable directories exist
 mkdir -p /var/www/html/resources/templates/cache
