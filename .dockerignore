@@ -11,6 +11,8 @@ tests
 vendor
 *.md
 *.sql
+!gibbon.sql
+!gibbon_demo.sql
 *.neon
 CHANGEDB.php
 CHANGELOG.txt
