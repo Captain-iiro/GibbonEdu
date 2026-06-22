@@ -1024,6 +1024,8 @@ CREATE TABLE `gibbonAttendanceLogPerson` (
   `gibbonFormGroupID` int(5) UNSIGNED ZEROFILL DEFAULT NULL,
   `gibbonCourseClassID` int(8) UNSIGNED ZEROFILL DEFAULT NULL,
   `gibbonTTDayRowClassID` int(12) UNSIGNED ZEROFILL DEFAULT NULL,
+  `foreignTable` varchar(60) DEFAULT NULL,
+  `foreignTableID` int(14) UNSIGNED ZEROFILL DEFAULT NULL,
   `timestampTaken` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
@@ -2008,6 +2010,46 @@ CREATE TABLE `gibbonFamilyUpdate` (
   `gibbonPersonIDUpdater` int(10) UNSIGNED ZEROFILL NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `gibbonFile`
+--
+
+CREATE TABLE `gibbonFile` (
+  `gibbonFileID` int(12) UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT,
+  `filePath` varchar(255) NOT NULL,
+  `fileName` varchar(255) NOT NULL,
+  `fileExtension` varchar(10) NOT NULL,
+  `fileSize` int(12) UNSIGNED NOT NULL,
+  `mimeType` varchar(100) NOT NULL,
+  `gibbonPersonIDOwner` int(10) UNSIGNED ZEROFILL DEFAULT NULL,
+  `uploadedAt` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `checksum` varchar(64) NOT NULL,
+  PRIMARY KEY (`gibbonFileID`),
+  KEY `gibbonPersonIDOwner` (`gibbonPersonIDOwner`),
+  KEY `filePath` (`filePath`),
+  KEY `checksum` (`checksum`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `gibbonFilePointer`
+--
+
+CREATE TABLE `gibbonFilePointer` (
+  `gibbonFilePointerID` int(12) UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT,
+  `gibbonFileID` int(12) UNSIGNED ZEROFILL NOT NULL,
+  `foreignTable` varchar(60) DEFAULT NULL,
+  `foreignTableID` int(14) UNSIGNED ZEROFILL DEFAULT NULL,
+  `foreignColumn` varchar(60) DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`gibbonFilePointerID`),
+  KEY `gibbonFileID` (`gibbonFileID`),
+  KEY `foreignTable` (`foreignTable`, `foreignTableID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -3139,6 +3181,7 @@ CREATE TABLE `gibbonLibraryShelf` (
   `field` varchar(90) NOT NULL,
   `fieldValue` varchar(90) DEFAULT NULL,
   `type` enum('Manual','Automatic') NOT NULL DEFAULT 'Manual',
+  `gibbonLibraryTypeID` int(10) UNSIGNED ZEROFILL DEFAULT NULL,
   `sequenceNumber` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
@@ -4553,6 +4596,8 @@ CREATE TABLE `gibbonPlannerEntry` (
   `gibbonPlannerEntryID` int(14) UNSIGNED ZEROFILL NOT NULL,
   `gibbonCourseClassID` int(8) UNSIGNED ZEROFILL NOT NULL,
   `gibbonUnitID` int(10) UNSIGNED ZEROFILL DEFAULT NULL,
+  `gibbonSpaceID` int(10) UNSIGNED ZEROFILL DEFAULT NULL,
+  `gibbonTTDayRowClassID` int(12) UNSIGNED ZEROFILL DEFAULT NULL,
   `date` date DEFAULT NULL,
   `timeStart` time DEFAULT NULL,
   `timeEnd` time DEFAULT NULL,
@@ -4862,7 +4907,8 @@ CREATE TABLE `gibbonReportingProgress` (
   `gibbonFormGroupID` int(5) UNSIGNED ZEROFILL DEFAULT NULL,
   `gibbonCourseClassID` int(8) UNSIGNED ZEROFILL NOT NULL,
   `gibbonPersonIDStudent` int(10) UNSIGNED ZEROFILL NOT NULL,
-  `status` enum('In Progress','Complete') NOT NULL DEFAULT 'In Progress'
+  `status` enum('In Progress','Complete') NOT NULL DEFAULT 'In Progress',
+  `checked` enum('N','Y') NOT NULL DEFAULT 'N'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- --------------------------------------------------------
