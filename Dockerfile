@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libjpeg62-turbo-dev \
         unzip \
         git \
+        locales \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
         curl \
@@ -29,7 +30,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && pecl install apcu \
     && docker-php-ext-enable apcu \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && sed -i '/fr_FR.UTF-8/s/^# //' /etc/locale.gen \
+    && locale-gen fr_FR.UTF-8
 
 # Enable Apache modules
 RUN a2enmod rewrite headers expires remoteip \
